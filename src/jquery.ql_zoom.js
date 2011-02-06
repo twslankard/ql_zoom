@@ -121,8 +121,12 @@
         dy = 0;
 
         // These don't seem to be wanting to scale with smaller bounding boxes
-        dW = (w * source_width) / orig_width;
-        dH = (h * source_height) / orig_height;
+        //dW = (w * source_width) / orig_width;
+        //dH = (h * source_height) / orig_height;
+
+        // I don't know why this works
+        dW = 400;
+        dH = 200;
 
         // Prevent drawImage from chocking on values < 0
         if(sx < 0){
