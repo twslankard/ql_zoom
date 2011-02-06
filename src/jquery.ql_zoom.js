@@ -34,7 +34,9 @@
 
           $canvas = $('<canvas>', { 'id': 'viewer'+_time, 'style': 'display:none; position:absolute; border:2px solid #000;' }),
 
-          target_image, orig_image, t_h, t_w, o_h, o_w,
+          target_image, orig_image,
+          source_width, source_height,
+          orig_width, orig_height,
 
           w = parseInt( settings.width, 10 ),
           h = parseInt( settings.height, 10 );
@@ -49,16 +51,17 @@
         // Save a copy of the original image
         orig_image = $this.find('img').first();
 
+        orig_height = orig_image.height();
+        orig_width = orig_image.width();
+        
         // Attach the target image to the safe container
         target_image = $('<img>', { 'src': orig_image.data('url'), 'style': 'display:none;'}).appendTo($this);
 
         // Use the lovely & talented Paul Irish's imagesLoaded helper
         target_image.imagesLoaded(function(){
-          t_h = target_image.height();
-          t_w = target_image.width();
-
-          o_h = orig_image.height();
-          o_w = orig_image.width();
+          // Cache dimensions of both images
+          source_height = target_image.height();
+          source_width = target_image.width();
         });
 
         // Cache the container's offset from the window
@@ -77,47 +80,85 @@
 
         // Expose a copy of the raw element
         c = $canvas.get()[0].getContext('2d');
-
       }
 
-      // Returns top and left positions calculated for centering box
-      function offset(x, y){
-        var l =  ( x - o.left ) - ~~( w / 2),
-            t = ( y - o.top ) - ~~( h / 2);
+      var output = $('#output');
 
-        return {
-          left: l + "px",
-          top:  t + "px"
-        };
+      // Returns top and left positions calculated for centering box
+      function offset(x, y, width, height){
+
+        width = width || w;
+        height = height || h;
+
+        var l =  ( x - o.left ) - ~~( width / 2),
+            t = ( y - o.top ) - ~~( height / 2);
+
+        return [l,t];
       }
 
       // Returns sx, sy, sw and sh arguements for drawImage
       function magnify( ix, iy ){
-        var sy = iy < 0 ? 0 : iy / ( o_h / t_h ),
-            sx = ix < 0 ? 0 : ix / ( o_w / t_w ),
+        var sx, sy, sW, sH, dx, dy, dW, dH, coords;
 
-            width = w * (o_w / t_w),
-            height = h * (o_h / t_h);
+        sx = ix + (ix * ( source_width / orig_width ));
+        sy = iy + (iy * ( source_height / orig_height));
 
-        return [sx, sy, w, h ];
+        sW = w;
+        sH = h;
+
+        dx = 0;
+        dy = 0;
+
+        dW = w * 1.5;
+        dH = h * 1.5;
+
+        if(sx < 0){
+          sx = 0;
+        }
+
+        if(sx > source_width - w){
+          sx = orig_width;
+        }
+
+        if(sy < 0){
+          sy =0;
+        }
+
+        if(sy > source_height - h){
+          sy = orig_height - 16;
+        }
+
+
+        return [~~sx, ~~sy, ~~sW, ~~sH, dx, dy, ~~dW, ~~dH ];
       }
+
 
       function track(e) {
         var position, rect,
             coords = offset( e.pageX, e.pageY );
 
         // Set the canvas to follow the cursor
-        $canvas.css(coords);
+        $canvas.css({ left: coords[0] +'px', top: coords[1] +'px' });
 
-        // Grab the css position 
-        // TODO prolly don't need to do this, since we've already got the coords
         position = $canvas.position();
 
         // Grab the scaled box height and offset distances
         rect = magnify( position.left, position.top );
 
+        output.html("sx = "+rect[0] +", sy =" + rect[1] +
+                    ", sW = "+rect[2] +", sH =" + rect[3] +
+                    ", dx = "+rect[4] +", dy =" + rect[5] +
+                    ", dW = "+rect[6] +", dH =" + rect[7] +
+                    ", pageX ="+e.pageX+", pageY ="+ e.pageY );
+
+
         // Draw the image onto canvas
-        c.drawImage(target_image[0], rect[0], rect[1], rect[2], rect[3], 0, 0, 300, 150 );
+        try{
+          c.drawImage(target_image[0], rect[0], rect[1], rect[2], rect[3], rect[4], rect[5], rect[6], rect[7] );
+        } catch(error){
+          console.dir(error);
+        }
+        
       }
 
       // Set everything up
@@ -146,6 +187,6 @@
     height:'200px',
     speed: '800',
     throttle: 50,
-    pointer: 'ne-resize'
+    pointer: 'crosshair'
 	};
 })(jQuery);

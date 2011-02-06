@@ -195,6 +195,7 @@ body.error #error {display:block; }
 
 
 
+#output {float:left; clear:both; position:absolute; top:10px; left:400px;}
 
 
 
