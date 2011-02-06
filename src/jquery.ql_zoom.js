@@ -53,7 +53,7 @@
 
         orig_height = orig_image.height();
         orig_width = orig_image.width();
-        
+
         // Attach the target image to the safe container
         target_image = $('<img>', { 'src': orig_image.data('url'), 'style': 'display:none;'}).appendTo($this);
 
@@ -63,9 +63,6 @@
           source_height = target_image.height();
           source_width = target_image.width();
         });
-
-        // Cache the container's offset from the window
-        o = $this.offset();
 
         // Attach canvas to our container
         $canvas.appendTo($this);
@@ -77,6 +74,9 @@
 
         // Set some additional styling on canvas
         $this.css({ 'overflow': 'hidden', 'cursor': settings.pointer });
+
+        // Cache the container's offset from the window
+        o = $this.offset();
 
         // Expose a copy of the raw element
         c = $canvas.get()[0].getContext('2d');
@@ -98,7 +98,7 @@
 
       // Returns sx, sy, sw and sh arguements for drawImage
       function magnify( ix, iy ){
-        var sx, sy, sW, sH, dx, dy, dW, dH, coords;
+        var sx, sy, sW, sH, dx, dy, dW, dH;
 
         sx = ix + (ix * ( source_width / orig_width ));
         sy = iy + (iy * ( source_height / orig_height));
@@ -127,7 +127,6 @@
         if(sy > source_height - h){
           sy = orig_height - 16;
         }
-
 
         return [~~sx, ~~sy, ~~sW, ~~sH, dx, dy, ~~dW, ~~dH ];
       }
@@ -158,7 +157,6 @@
         } catch(error){
           console.dir(error);
         }
-        
       }
 
       // Set everything up

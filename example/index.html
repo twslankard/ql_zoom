@@ -44,14 +44,27 @@
         <article>
           <h2>Good News, Everyone!</h2>
           <p>I've created a new jQuery plugin to handle image zooming, like you find on many e-commerce sites.</p>
-          <p>Unlikey many other plugins I've found, this one uses the mystical power of the forbidden Canvas Element to accomplish much of it's dirty work. It also takes advantage of Ben Alman's $.throttle() plugin to keep events bound to mouse-move in check.</p>
+          <p>Unlike many of the zoom plugins I've found, this one uses the mystical power of the forbidden Canvas Element to accomplish much of it's dirty work. It also takes advantage of Ben Alman's $.throttle() plugin to keep events bound to mouse-move in check.</p>
+          <p>Ql_zoom accepts a myriad of options, these are the defaults:</p>
+            <pre>
+              width: '200px'
+              height:'200px'
+              speed: '800'
+              throttle: 50
+              pointer: 'crosshair'
+            </pre>
         </article>
       </section>
+      <section>
+      <article>
+      <h2>DR. ZOIDBERG LOVES THIS PLUGIN</h2>
+      <p><em>"If it's good enough for a horrible monster like [Dr. Zoidberg], it's good enough for you maybe?"</em></p>
+      </article>
 
       <figure class="image">
-        <img src="images/zoidberg_med.jpg" alt="The Good Doctor" data-url="images/zoidberg.jpg" />
+      <img src="images/zoidberg_med.jpg" alt="The Good Doctor" data-url="images/zoidberg.jpg" />
       </figure>
-
+      </section>
       <figure class="custom_image">
         <img src="images/futurama_med.jpg" alt="Futurama" data-url="images/futurama.jpg" />
       </figure>
