@@ -57,7 +57,7 @@
         orig_width = orig_image.width();
 
         // Attach the target image to the safe container
-        target_image = $('<img>', { 'src': orig_image.data('url'), 'style': 'display:none;'}).appendTo($this);
+        target_image = $('<img>', { 'src': ( !! orig_image.data('url') ) ? orig_image.data('url') : orig_image.attr('src'), 'style': 'display:none;'}).appendTo($this);
 
         // Using the lovely & talented Paul Irish's imagesLoaded helper
         target_image.imagesLoaded(function(){
