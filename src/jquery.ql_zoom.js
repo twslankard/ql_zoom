@@ -32,7 +32,7 @@
 
           $this = $(this),
 
-          $canvas = $('<canvas>', { 'id': 'viewer'+_time, 'style': 'display:none; position:absolute; border:2px solid #000;' }),
+          $canvas = $('<canvas>', { 'id': 'viewer'+_time, 'style': settings.canvas_style }),
 
           target_image, orig_image,
           source_width, source_height,
@@ -115,7 +115,7 @@
         if(sx < 0){
           sx = 0;
         }
-
+        // This needs some love
         if(sx > source_width - w){
           sx = orig_width;
         }
@@ -124,6 +124,7 @@
           sy =0;
         }
 
+        // Also, this
         if(sy > source_height - h){
           sy = orig_height - 16;
         }
@@ -185,6 +186,7 @@
     height:'200px',
     speed: '800',
     throttle: 50,
-    pointer: 'crosshair'
+    pointer: 'crosshair',
+    canvas_style: 'display:none; position:absolute; border:1px solid #444;'
 	};
 })(jQuery);
