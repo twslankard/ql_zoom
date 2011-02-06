@@ -39,28 +39,36 @@
 
       <section>
         <figure class="image">
-          <img src="images/professor.png" alt="The Professor" data-url="images/professor.png" width="400" />
+          <img src="images/professor.png" alt="The Professor" width="400" />
         </figure>
         <article>
           <h2>Good News, Everyone!</h2>
           <p>I've created a new jQuery plugin to handle image zooming, like you find on many e-commerce sites.</p>
           <p>Unlike many of the zoom plugins I've found, this one uses the mystical power of the forbidden Canvas Element to accomplish much of it's dirty work. It also takes advantage of Ben Alman's $.throttle() plugin to keep events bound to mouse-move in check.</p>
-          <p>Ql_zoom accepts a myriad of options, these are the defaults:</p>
-            <pre>
-              width: '200px'
-              height:'200px'
-              speed: '800'
-              throttle: 50
-              pointer: 'crosshair'
-              canvas_style: 'display:none; position:absolute; border:1px solid #444;'
-            </pre>
-          <p>These are the way they are for a reason, so don't overwrite them with anything falsy, you depraved idiot!</p>
-        </article>
+          <p>It relies on a larger source image by default, which is loaded asyncronously and then translated onto the canvas element, which guides the zoomed selection. If you don't have a larger image, that's ok too. In that case it's probably a good idea to scale down your image with css, and ql_zoom will handle the rest. Currently, the image needs to be wrapped in a container tag; I'd recommend a figure tag.</p>
+          <p>Here's how to invoke it:</p>
+          <pre>
+            $('.image-container').ql_zoom(options);
+          </pre>
+          <p>...where `options` is an object containing parameters.</p>
+          </article>
       </section>
       <section>
       <article>
       <h2>DR. ZOIDBERG LOVES THIS PLUGIN</h2>
       <p><em>"If it's good enough for a horrible monster like [Dr. Zoidberg], it's good enough for you maybe?"</em></p>
+      <p>Ql_zoom accepts a myriad of options, these are the defaults:</p>
+        <pre>
+          width: '200px'
+          height:'200px'
+          speed: '800'
+          throttle: 50
+          pointer: 'crosshair'
+          canvas_style: 'display:none; position:absolute; border:1px solid #444;'
+        </pre>
+      <p>These are the way they are for a reason, so don't overwrite them with anything falsy, you depraved idiot!</p>
+      <h2>For optical application only!</h2>
+      <p>This is an open source project. Please report any bugs to the issue tracker on <a href="https://github.com/quickleft/ql_zoom">Github</a>, and fork it if you want to fix anything.</p>
       </article>
 
       <figure class="image">
@@ -73,7 +81,7 @@
     </div>
     
     <footer>
-
+    <p>&copy; 2011 <a href="http://quickleft.com/">Quick Left</a> with an MIT License</p>
     </footer>
   </div> <!--! end of #container -->
 

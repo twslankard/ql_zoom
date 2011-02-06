@@ -173,14 +173,12 @@ em {font-style:italic;}
 #container h2 { padding-bottom:1em;}
 #container p { padding-bottom:1em;}
 #container .gal { margin-bottom:20px;}
-#container pre { float:left; width: 400px; border: 1px solid #DEDEDE!important;background-color: ghostWhite!important; font-size: 12px!important; margin:0 0 1em 0;}
-#container section {position:relative; overflow:hidden; }
+#container pre { float:left; width: 388px; border: 1px solid #DEDEDE!important;background-color: ghostWhite!important; font-size: 12px!important; margin:0 0 12px 0;}
+#container section {position:relative; float:left; clear:both;}
 #container .gal_copy { display:none;}
 
-#container footer {margin: 20px 0 ;}
+#container footer {margin: 20px 0 ; float:left; clear:both;}
 
-#container .extra_slide {width:628px;float:left;padding: 36px; background:#00adf0; height:158px; color:#fff; font-size: 1.5em; }
-#container .extra_slide h1 { border-bottom:none; color:#fff;}
 
 body.error {background: #FF3342; }
 #error {position:fixed; top:20%; padding:2em; width: 20%; left:40%; background:#fff; color:#333; z-index:1000; display:none; border:2px solid #000; font-weight:bold;}
@@ -199,7 +197,7 @@ body.error #error {display:block; }
 
 #container figure {float:left; position:relative; margin: 1em 3em 0 0; text-align:center; }
 #container section { float:left; clear:both; padding-bottom:2em;}
-#container section article { float:left; width:400px;}
+#container section article { float:left; width:450px; padding-right:20px;}
 
 
 #output {float:left; clear:both; position:fixed; top:18px; left:400px; background:#fff; z-index:1000; padding: 0 1em;}
