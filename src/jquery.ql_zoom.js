@@ -1,7 +1,7 @@
 /*
 	Copyright (c) 2011 Samuel Breed, http://quickleft.com
 
-  v0.0.1a
+  v0.0.1
 	
 	Permission is hereby granted, free of charge, to any person obtaining
 	a copy of this software and associated documentation files (the
@@ -23,10 +23,10 @@
 	WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 (function($){
-	$.fn.ql_zoom = function(options) {
-		var settings = $.extend({}, $.fn.ql_zoom.defaultOptions, options);
+  $.fn.ql_zoom = function(options) {
+    var settings = $.extend({}, $.fn.ql_zoom.defaultOptions, options);
 
-		return this.each(function() {
+    return this.each(function() {
       var c, pos, o,
           _time = new Date().getTime(),
 
@@ -43,6 +43,7 @@
 
       function init(){
         // Create a container if the selector is the target image
+        // TODO: fix this cause it doesn't work right =/
         if( /IMG/.test( $(this)[0].nodeName ) === true ) {
           $this.wrapAll( $("<div>", { id: 'ql_zoom_'+_time, 'class': 'ql_zoom_container' }) );
           $this = $('#ql_zoom_'+_time);
@@ -103,7 +104,7 @@
       // Scales current image selection to target image and
       // returns all arguments for canvas.drawImage()
       //
-      //    http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#images
+      //    [drawImage docs](http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#images)
       function magnify( ix, iy ){
         var sx, sy, sW, sH, dx, dy, dW, dH;
 

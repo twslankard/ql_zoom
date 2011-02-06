@@ -5,16 +5,16 @@ require 'closure-compiler'
 
 namespace :js do
 
-  desc "Compress monkeyfist.js with YUI"
+  desc "Compress jquery.ql_zoom.js with YUI"
 
   task :yui do
-    compress_yui('src/monkeyfist.js')
+    compress_yui('src/jquery.ql_zoom.js')
   end
 
-  desc "Compress monkeyfist.js with Closure"
+  desc "Compress jquert.ql_zoom.js with Closure"
 
   task :closure do
-    compress_closure('src/monkeyfist.js')
+    compress_closure('src/jquery.ql_zoom.js')
   end
 
   def compress_closure(path)
@@ -24,7 +24,7 @@ namespace :js do
     file_handle.close
 
     #overwrite the file
-    File.open('monkeyfist.min.js', "w+") { |file| file.puts compressed_output }
+    File.open('src/jquery.ql_zoom.min.js', "w+") { |file| file.puts compressed_output }
 
   end
 
@@ -37,7 +37,7 @@ namespace :js do
     file_handle.close
 
     #overwrite the file
-    File.open('monkeyfist.min.js', "w+") { |file| file.puts compressed_output }
+    File.open('src/jquery.ql_zoom.min.js', "w+") { |file| file.puts compressed_output }
   end
 
 end

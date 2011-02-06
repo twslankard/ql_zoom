@@ -1,0 +1,12 @@
+GEM
+  remote: http://rubygems.org/
+  specs:
+    closure-compiler (1.0.0)
+    yui-compressor (0.9.3)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  closure-compiler
+  yui-compressor
