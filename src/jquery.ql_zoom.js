@@ -1,4 +1,46 @@
+// Dependencies:
+//  imagesLoaded
+//  throttle
+
 /*
+  $.fn.imagesLoaded mit license. paul irish. 2010.
+  webkit fix from Oren Solomianik. thx!
+*/
+
+$.fn.imagesLoaded = function(callback){
+  var elems = this.filter('img'),
+      len   = elems.length;
+      
+  elems.bind('load',function(){
+      if (--len <= 0){ callback.call(elems,this); }
+  }).each(function(){
+     // cached images don't fire load sometimes, so we reset src.
+     if (this.complete || this.complete === undefined){
+        var src = this.src;
+        // webkit hack from http://groups.google.com/group/jquery-dev/browse_thread/thread/eee6ab7b2da50e1f
+        // data uri bypasses webkit log warning (thx doug jones)
+        this.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
+        this.src = src;
+     }  
+  }); 
+
+  return this;
+};
+
+/*
+  jQuery throttle / debounce - v1.1 - 3/7/2010
+  http://benalman.com/projects/jquery-throttle-debounce-plugin/
+
+  Copyright (c) 2010 "Cowboy" Ben Alman
+  Dual licensed under the MIT and GPL licenses.
+  http://benalman.com/about/license/
+*/
+
+(function(b,c){var $=b.jQuery||b.Cowboy||(b.Cowboy={}),a;$.throttle=a=function(e,f,j,i){var h,d=0;if(typeof f!=="boolean"){i=j;j=f;f=c}function g(){var o=this,m=+new Date()-d,n=arguments;function l(){d=+new Date();j.apply(o,n)}function k(){h=c}if(i&&!h){l()}h&&clearTimeout(h);if(i===c&&m>e){l()}else{if(f!==true){h=setTimeout(i?k:l,i===c?e-m:e)}}}if($.guid){g.guid=j.guid=j.guid||$.guid++}return g};$.debounce=function(d,e,f){return f===c?a(d,e,false):a(d,f,e!==false)}})(this);
+
+/*
+  QL Zoom
+
 	Copyright (c) 2011 Samuel Breed, http://quickleft.com
 
   v0.0.1
@@ -41,50 +83,6 @@
           w = parseInt( settings.width, 10 ),
           h = parseInt( settings.height, 10 );
 
-      function init(){
-        // Create a container if the selector is the target image
-        // TODO: fix this cause it doesn't work right =/
-        if( /IMG/.test( $(this)[0].nodeName ) === true ) {
-          $this.wrapAll( $("<div>", { id: 'ql_zoom_'+_time, 'class': 'ql_zoom_container' }) );
-          $this = $('#ql_zoom_'+_time);
-        }
-
-        // Save a copy of the original image
-        orig_image = $this.find('img').first();
-
-        // Cache original image dimensions
-        orig_height = orig_image.height();
-        orig_width = orig_image.width();
-
-        // Attach the target image to the safe container
-        target_image = $('<img>', { 'src': ( !! orig_image.data('url') ) ? orig_image.data('url') : orig_image.attr('src'), 'style': 'display:none;'}).appendTo($this);
-
-        // Using the lovely & talented Paul Irish's imagesLoaded helper
-        target_image.imagesLoaded(function(){
-          // Cache source image dimensions
-          source_height = target_image.height();
-          source_width = target_image.width();
-        });
-
-        // Attach canvas to our container
-        $canvas.appendTo($this);
-        $canvas.css({ 'width': settings.width, 'height': settings.height });
-
-        // Update position, if it's static. If it's fixed, good luck?
-        if( /static/.test(pos) ){
-          $this.css('position', 'relative');
-        }
-
-        // Set some additional styling on canvas
-        $this.css({ 'overflow': 'hidden', 'cursor': settings.pointer });
-
-        // Cache the container's offset from the window
-        o = $this.offset();
-
-        // Expose a copy of the raw element
-        c = $canvas.get()[0].getContext('2d');
-      }
-
       // Debugging ONLY
       var output = $('#output');
 
@@ -116,7 +114,7 @@
         sW = w;
         sH = h;
 
-        // Starting coords for cancas
+        // Starting coords for canvas
         dx = 0;
         dy = 0;
 
@@ -125,11 +123,24 @@
         //dH = (h * source_height) / orig_height;
 
         // I don't know why this works
-        dW = 400;
-        dH = 200;
+        dW = w * 2;
+        dH = h;
+
+        // Handling for portion of viewer outside boundary of original image
+        // by scaling down the draw area
+        if(sx > source_width - w){
+          sW = source_width - sx;
+          dW = sW * 2;
+        }
+
+        if(sy > source_height - h){
+          sH = source_height - sy;
+          dH = sH;
+        }
 
         // Prevent drawImage from chocking on values < 0
         if(sx < 0){
+          dx = Math.abs(sx);
           sx = 0;
         }
 
@@ -137,20 +148,8 @@
           sy = 0;
         }
 
-        // Handling for portion of viewer outside boundary of original image
-        // by scaling down the draw area
-        if(sx > source_width - w){
-          sW = source_width - sx;
-          dW = (w - (w - sW)) * 1.5;
-        }
-
-        if(sy > source_height - h){
-          sH = source_height - sy;
-          dH = (h - (h - sH)) * 1.5;
-        }
-
         // Math.floor all values on the way out to prevent subpixel rendering
-        return [~~sx, ~~sy, ~~sW, ~~sH, dx, dy, ~~dW, ~~dH];
+        return [~~sx, ~~sy, ~~sW, ~~sH, ~~dx, ~~dy, ~~dW, ~~dH];
       }
 
       // Re-position canvas on mousemove to follow cursor
@@ -178,6 +177,7 @@
 
         // Draw the image onto canvas
         try{
+          c.clearRect(0,0,400,400);
           c.drawImage( target_image[0], rect[0], rect[1], rect[2], rect[3], rect[4], rect[5], rect[6], rect[7] );
         } catch(error){
           // Debug ONLY
@@ -185,24 +185,79 @@
         }
       }
 
+      function Events() {
+        // Bind show / hide canvas on hover
+        // Bind mousemove with Ben Alman's $.throttle plugin to keep canvas re-draws down
+        $this
+          .mouseenter( function(e){
+            $canvas.fadeIn(settings.speed);
+          })
+          .mouseleave( function(e){
+            $canvas.fadeOut(settings.speed);
+          })
+          .mousemove( $.throttle( settings.throttle, track) );
+
+        // Reset the cached offset in case of a resize
+        $(window).resize(function(e){
+          o = $this.offset();
+        });
+      }
+
       // Set everything up
-      init();
+      (function init(){
+        // Create a container if the selector is the target image
+        // TODO: fix this cause it doesn't work right =/
+        if( /IMG/.test( $(this)[0].nodeName ) === true ) {
+          $this.wrapAll( $("<div>", { id: 'ql_zoom_'+_time, 'class': 'ql_zoom_container' }) );
+          $this = $('#ql_zoom_'+_time);
+        }
 
-      // Bind show / hide canvas on hover
-      // Bind mousemove with Ben Alman's $.throttle plugin to keep canvas re-draws down
-      $this
-        .mouseenter( function(e){
-          $canvas.fadeIn(settings.speed);
-        })
-        .mouseleave( function(e){
-          $canvas.fadeOut(settings.speed);
-        })
-        .mousemove( $.throttle( settings.throttle, track) );
+        // Save a copy of the original image
+        orig_image = $this.find('img').first();
 
-      // Reset the cached offset in case of a resize
-      $(window).resize(function(e){
+        // Cache original image dimensions
+        orig_height = orig_image.height();
+        orig_width = orig_image.width();
+
+        // Attach the target image to the safe container
+        target_image = $('<img>', { 'src': ( !! orig_image.data('url') ) ? orig_image.data('url') : orig_image.attr('src'), 'style': 'display:none;'}).appendTo($this);
+
+        // Using the lovely & talented Paul Irish's imagesLoaded helper
+        target_image.imagesLoaded(function(){
+          // Cache source image dimensions
+          source_height = target_image.height();
+          source_width = target_image.width();
+
+          if( source_height <= orig_height ) {
+            return;
+          }
+
+          if( source_width <= orig_width ) {
+            return;
+          }
+        });
+
+        // Attach canvas to our container
+        $canvas.appendTo($this);
+        $canvas.css({ 'width': settings.width, 'height': settings.height });
+
+        // Update position, if it's static. If it's fixed, good luck?
+        if( /static/.test(pos) ){
+          $this.css('position', 'relative');
+        }
+
+        // Set some additional styling on canvas
+        $this.css({ 'overflow': 'hidden', 'cursor': settings.pointer });
+
+        // Cache the container's offset from the window
         o = $this.offset();
-      });
+
+        // Expose a copy of the raw element
+        c = $canvas.get()[0].getContext('2d');
+
+        Events();
+      })();
+
 
 		});
 	};
