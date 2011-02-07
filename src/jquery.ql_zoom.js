@@ -44,7 +44,7 @@
 
   Copyright (c) 2011 Samuel Breed, http://quickleft.com
 
-  v0.0.1
+  v0.0.2
 
   Permission is hereby granted, free of charge, to any person obtaining
   a copy of this software and associated documentation files (the
@@ -84,18 +84,11 @@
           w = parseInt( settings.width, 10 ),
           h = parseInt( settings.height, 10 );
 
-      // Debugging ONLY
-      var output = $('#output');
-
       // Returns top and left positions calculated for centering box
-      function offset(x, y, width, height){
-
-        width = width || w;
-        height = height || h;
-
+      function offset(x, y){
         // Calculate the relative coordinates, subtracting from the center to get (sx, sy)
-        var l =  ( x - o.left ) - ~~( width / 2),
-            t = ( y - o.top ) - ~~( height / 2);
+        var l =  ( x - o.left ) - ~~( w / 2),
+            t = ( y - o.top ) - ~~( h / 2);
 
         return [l,t];
       }
@@ -170,14 +163,6 @@
         // Grab the scaled box height and offset distances
         rect = magnify( position.left, position.top );
 
-        // Debug ONLY
-        output.html("sx = "+rect[0] +", sy =" + rect[1] +
-                    ", sW = "+rect[2] +", sH =" + rect[3] +
-                    ", dx = "+rect[4] +", dy =" + rect[5] +
-                    ", dW = "+rect[6] +", dH =" + rect[7] +
-                    ", pageX ="+coords[0]+", pageY ="+ coords[1] );
-
-
         // Draw the image onto canvas
         try{
           c.clearRect(0,0,400,400);
@@ -224,17 +209,6 @@
           $this = $('#ql_zoom_'+_time);
         }
 
-        // Save a copy of the original image
-        orig_image = $this.find('img').first();
-
-        // Cache original image dimensions
-        orig_height = orig_image.height();
-        orig_width = orig_image.width();
-
-        // Attach the target image to the safe container
-        target_image = $('<img>', { 'src': ( !! orig_image.data('url') ) ? orig_image.data('url') : orig_image.attr('src'), 'style': 'display:none;'}).appendTo($this);
-
-
         // Attach canvas to our container
         $canvas.appendTo($this);
         $canvas.css({ 'width': settings.width, 'height': settings.height });
@@ -242,7 +216,6 @@
         // Remember to explicitly set width and height attrs. This is extremely important
         $canvas[0].setAttribute('width', w);
         $canvas[0].setAttribute('height', h);
-
 
         // Update position, if it's static. If it's fixed, good luck?
         if( /static/.test(pos) ){
@@ -255,18 +228,30 @@
         // Cache the container's offset from the window
         o = $this.offset();
 
-        // Expose a copy of the raw element
+        // Expose a copy of the HTML5 context
         c = $canvas.get()[0].getContext('2d');
+
+        // Save a copy of the original image
+        orig_image = $this.find('img').first();
+
+        // Cache original image dimensions
+        orig_height = orig_image.height();
+        orig_width = orig_image.width();
+
+        // Attach the target image to the safe container
+        target_image = $('<img>', { 'src': ( !! orig_image.data('url') ) ? orig_image.data('url') : orig_image.attr('src'), 'style': 'display:none;'}).appendTo($this);
+
         // Using the lovely & talented Paul Irish's imagesLoaded helper
         target_image.imagesLoaded(function(){
           // Cache source image dimensions
           source_height = target_image.height();
           source_width = target_image.width();
 
+          // Attach our DOM events after larger image is loaded
           Events();
         });
 
-      })();
+      })(); // End init()
     });
   };
 
