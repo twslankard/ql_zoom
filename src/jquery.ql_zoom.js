@@ -101,8 +101,8 @@
         var sx, sy, sW, sH, dx, dy, dW, dH;
 
         // Mark the top left corner of target box, scaled from same point on original image
-        sx = ( (ix * source_width) / orig_width ) + (w / 2);
-        sy = ( (iy * source_height) / orig_height ) + (h /2);
+        sx = ( (ix * source_width) / orig_width ) + (( w / ( source_width / orig_width )) / 2 );
+        sy = ( (iy * source_height) / orig_height ) + (( w / ( source_height / orig_height)) / 2 );
 
         // Viewing box is set from user settings
         sW = w;
@@ -119,27 +119,24 @@
         // Handling for portion of viewer outside boundary of original image
         // by scaling down the draw area
         if(sx > source_width - w){
-          sW = source_width - sx;
-          dW = sW;
+          dW = ( source_width  - sx );
+          sW = dW;
+          //sx = orig_width;
         }
 
         if(sy > source_height - h){
-          sH = source_height - sy;
+          sH = ( source_height - sy );
           dH = sH;
         }
 
         // Prevent drawImage from chocking on values < 0
         if(sx < 0){
-          //dx = Math.abs(sx);
-          //sW = w + sx;
-          //dW = sW;
+          dx = Math.abs(sx) + sx / (source_width / orig_width );
           sx = 0;
         }
 
         if(sy < 0){
-          //dy = Math.abs(sy);
-          //sH = h + sy;
-          //dH = sH;
+          dy = Math.abs(sy) + sy/ ( source_height / orig_height );
           sy = 0;
         }
 
