@@ -10,7 +10,7 @@
 $.fn.imagesLoaded = function(callback){
   var elems = this.filter('img'),
       len   = elems.length;
-      
+
   elems.bind('load',function(){
       if (--len <= 0){ callback.call(elems,this); }
   }).each(function(){
@@ -41,28 +41,28 @@ $.fn.imagesLoaded = function(callback){
 /*
   QL Zoom
 
-	Copyright (c) 2011 Samuel Breed, http://quickleft.com
+  Copyright (c) 2011 Samuel Breed, http://quickleft.com
 
   v0.0.1
-	
-	Permission is hereby granted, free of charge, to any person obtaining
-	a copy of this software and associated documentation files (the
-	"Software"), to deal in the Software without restriction, including
-	without limitation the rights to use, copy, modify, merge, publish,
-	distribute, sublicense, and/or sell copies of the Software, and to
-	permit persons to whom the Software is furnished to do so, subject to
-	the following conditions:
-	
-	The above copyright notice and this permission notice shall be
-	included in all copies or substantial portions of the Software.
-	
-	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-	EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-	MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-	NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-	LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-	OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-	WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  
+  Permission is hereby granted, free of charge, to any person obtaining
+  a copy of this software and associated documentation files (the
+  "Software"), to deal in the Software without restriction, including
+  without limitation the rights to use, copy, modify, merge, publish,
+  distribute, sublicense, and/or sell copies of the Software, and to
+  permit persons to whom the Software is furnished to do so, subject to
+  the following conditions:
+  
+  The above copyright notice and this permission notice shall be
+  included in all copies or substantial portions of the Software.
+  
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+  NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+  LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+  OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+  WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 (function($){
   $.fn.ql_zoom = function(options) {
@@ -123,14 +123,14 @@ $.fn.imagesLoaded = function(callback){
         //dH = (h * source_height) / orig_height;
 
         // I don't know why this works
-        dW = w * 2;
+        dW = w;
         dH = h;
 
         // Handling for portion of viewer outside boundary of original image
         // by scaling down the draw area
         if(sx > source_width - w){
           sW = source_width - sx;
-          dW = sW * 2;
+          dW = sW;
         }
 
         if(sy > source_height - h){
@@ -141,10 +141,15 @@ $.fn.imagesLoaded = function(callback){
         // Prevent drawImage from chocking on values < 0
         if(sx < 0){
           dx = Math.abs(sx);
+          sW = w + sx;
+          dW = sW;
           sx = 0;
         }
 
         if(sy < 0){
+          dy = Math.abs(sy);
+          sH = h + sy;
+          dH = sH;
           sy = 0;
         }
 
@@ -240,6 +245,9 @@ $.fn.imagesLoaded = function(callback){
         // Attach canvas to our container
         $canvas.appendTo($this);
         $canvas.css({ 'width': settings.width, 'height': settings.height });
+        $canvas[0].setAttribute('width', w);
+        $canvas[0].setAttribute('height', h);
+
 
         // Update position, if it's static. If it's fixed, good luck?
         if( /static/.test(pos) ){
@@ -259,15 +267,15 @@ $.fn.imagesLoaded = function(callback){
       })();
 
 
-		});
-	};
+    });
+  };
 
-	$.fn.ql_zoom.defaultOptions = {
+  $.fn.ql_zoom.defaultOptions = {
     width: '200px',
     height:'200px',
     speed: '800',
     throttle: 50,
     pointer: 'crosshair',
     canvas_style: 'display:none; position:absolute; border:1px solid #444;'
-	};
+  };
 })(jQuery);
