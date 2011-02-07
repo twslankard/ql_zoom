@@ -6,8 +6,12 @@
 (function($){
   
   $(function(){
-    $('.image').ql_zoom();
-    $('.custom_image').ql_zoom({ throttle: 10, pointer: 'crosshair' });
+    if(Modernizr.canvas){
+      $('.image').ql_zoom();
+      $('.custom_image').ql_zoom({ throttle: 10, pointer: 'crosshair' });
+    } else {
+      alert('Your browser doens\'t support Canvas. \nThese aren\'t the droids you\'re looking for');
+    }
   });
 
 })(jQuery);
