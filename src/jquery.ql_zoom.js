@@ -10,7 +10,7 @@
 $.fn.imagesLoaded = function(callback){
   var elems = this.filter('img'),
       len   = elems.length;
-      
+
   elems.bind('load',function(){
       if (--len <= 0){ callback.call(elems,this); }
   }).each(function(){
@@ -123,14 +123,14 @@ $.fn.imagesLoaded = function(callback){
         //dH = (h * source_height) / orig_height;
 
         // I don't know why this works
-        dW = w * 2;
+        dW = w;
         dH = h;
 
         // Handling for portion of viewer outside boundary of original image
         // by scaling down the draw area
         if(sx > source_width - w){
           sW = source_width - sx;
-          dW = sW * 2;
+          dW = sW;
         }
 
         if(sy > source_height - h){
@@ -141,10 +141,15 @@ $.fn.imagesLoaded = function(callback){
         // Prevent drawImage from chocking on values < 0
         if(sx < 0){
           dx = Math.abs(sx);
+          sW = w + sx;
+          dW = sW;
           sx = 0;
         }
 
         if(sy < 0){
+          dy = Math.abs(sy);
+          sH = h + sy;
+          dH = sH;
           sy = 0;
         }
 
@@ -240,6 +245,9 @@ $.fn.imagesLoaded = function(callback){
         // Attach canvas to our container
         $canvas.appendTo($this);
         $canvas.css({ 'width': settings.width, 'height': settings.height });
+        $canvas[0].setAttribute('width', w);
+        $canvas[0].setAttribute('height', h);
+
 
         // Update position, if it's static. If it's fixed, good luck?
         if( /static/.test(pos) ){
