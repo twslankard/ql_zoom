@@ -6,26 +6,27 @@
   $.fn.imagesLoaded mit license. paul irish. 2010.
   webkit fix from Oren Solomianik. thx!
 */
+(function($){
+  $.fn.imagesLoaded = function(callback){
+    var elems = this.filter('img'),
+        len   = elems.length;
 
-$.fn.imagesLoaded = function(callback){
-  var elems = this.filter('img'),
-      len   = elems.length;
+    elems.bind('load',function(){
+        if (--len <= 0){ callback.call(elems,this); }
+    }).each(function(){
+       // cached images don't fire load sometimes, so we reset src.
+       if (this.complete || this.complete === undefined){
+          var src = this.src;
+          // webkit hack from http://groups.google.com/group/jquery-dev/browse_thread/thread/eee6ab7b2da50e1f
+          // data uri bypasses webkit log warning (thx doug jones)
+          this.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
+          this.src = src;
+       }  
+    }); 
 
-  elems.bind('load',function(){
-      if (--len <= 0){ callback.call(elems,this); }
-  }).each(function(){
-     // cached images don't fire load sometimes, so we reset src.
-     if (this.complete || this.complete === undefined){
-        var src = this.src;
-        // webkit hack from http://groups.google.com/group/jquery-dev/browse_thread/thread/eee6ab7b2da50e1f
-        // data uri bypasses webkit log warning (thx doug jones)
-        this.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
-        this.src = src;
-     }  
-  }); 
-
-  return this;
-};
+    return this;
+  };
+})(jQuery);
 
 /*
   jQuery throttle / debounce - v1.1 - 3/7/2010
@@ -43,8 +44,8 @@ $.fn.imagesLoaded = function(callback){
 
   Copyright (c) 2011 Samuel Breed, http://quickleft.com
 
-  v0.0.1
-  
+  v0.0.2
+
   Permission is hereby granted, free of charge, to any person obtaining
   a copy of this software and associated documentation files (the
   "Software"), to deal in the Software without restriction, including
@@ -52,10 +53,10 @@ $.fn.imagesLoaded = function(callback){
   distribute, sublicense, and/or sell copies of the Software, and to
   permit persons to whom the Software is furnished to do so, subject to
   the following conditions:
-  
+
   The above copyright notice and this permission notice shall be
   included in all copies or substantial portions of the Software.
-  
+
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
   EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -74,7 +75,7 @@ $.fn.imagesLoaded = function(callback){
 
           $this = $(this),
 
-          $canvas = $('<canvas>', { 'id': 'viewer'+_time, 'style': settings.canvas_style }),
+          $canvas = $('<canvas>', { 'id': 'viewer'+_time, 'style': 'display:none; position:absolute; '+settings.canvas_style }),
 
           target_image, orig_image,
           source_width, source_height,
@@ -83,18 +84,11 @@ $.fn.imagesLoaded = function(callback){
           w = parseInt( settings.width, 10 ),
           h = parseInt( settings.height, 10 );
 
-      // Debugging ONLY
-      var output = $('#output');
-
       // Returns top and left positions calculated for centering box
-      function offset(x, y, width, height){
-
-        width = width || w;
-        height = height || h;
-
+      function offset(x, y){
         // Calculate the relative coordinates, subtracting from the center to get (sx, sy)
-        var l =  ( x - o.left ) - ~~( width / 2),
-            t = ( y - o.top ) - ~~( height / 2);
+        var l =  ( x - o.left ) - ~~( w / 2),
+            t = ( y - o.top ) - ~~( h / 2);
 
         return [l,t];
       }
@@ -118,11 +112,7 @@ $.fn.imagesLoaded = function(callback){
         dx = 0;
         dy = 0;
 
-        // These don't seem to be wanting to scale with smaller bounding boxes
-        //dW = (w * source_width) / orig_width;
-        //dH = (h * source_height) / orig_height;
-
-        // I don't know why this works
+        // Now that the width and height are set properly, this works
         dW = w;
         dH = h;
 
@@ -140,16 +130,16 @@ $.fn.imagesLoaded = function(callback){
 
         // Prevent drawImage from chocking on values < 0
         if(sx < 0){
-          dx = Math.abs(sx);
-          sW = w + sx;
-          dW = sW;
+          //dx = Math.abs(sx);
+          //sW = w + sx;
+          //dW = sW;
           sx = 0;
         }
 
         if(sy < 0){
-          dy = Math.abs(sy);
-          sH = h + sy;
-          dH = sH;
+          //dy = Math.abs(sy);
+          //sH = h + sy;
+          //dH = sH;
           sy = 0;
         }
 
@@ -160,6 +150,7 @@ $.fn.imagesLoaded = function(callback){
       // Re-position canvas on mousemove to follow cursor
       // Get updated arguments and redraw zoom window based on position
       function track(e) {
+
         var position, rect,
             coords = offset( e.pageX, e.pageY );
 
@@ -172,14 +163,6 @@ $.fn.imagesLoaded = function(callback){
         // Grab the scaled box height and offset distances
         rect = magnify( position.left, position.top );
 
-        // Debug ONLY
-        output.html("sx = "+rect[0] +", sy =" + rect[1] +
-                    ", sW = "+rect[2] +", sH =" + rect[3] +
-                    ", dx = "+rect[4] +", dy =" + rect[5] +
-                    ", dW = "+rect[6] +", dH =" + rect[7] +
-                    ", pageX ="+coords[0]+", pageY ="+ coords[1] );
-
-
         // Draw the image onto canvas
         try{
           c.clearRect(0,0,400,400);
@@ -191,6 +174,15 @@ $.fn.imagesLoaded = function(callback){
       }
 
       function Events() {
+
+        if( source_height <= orig_height + ( orig_height / 10 ) ) {
+          return false;
+        }
+
+        if( source_width <= orig_width + ( orig_width / 10 ) ) {
+          return false;
+        }
+
         // Bind show / hide canvas on hover
         // Bind mousemove with Ben Alman's $.throttle plugin to keep canvas re-draws down
         $this
@@ -217,6 +209,28 @@ $.fn.imagesLoaded = function(callback){
           $this = $('#ql_zoom_'+_time);
         }
 
+        // Attach canvas to our container
+        $canvas.appendTo($this);
+        $canvas.css({ 'width': settings.width, 'height': settings.height });
+
+        // Remember to explicitly set width and height attrs. This is extremely important
+        $canvas[0].setAttribute('width', w);
+        $canvas[0].setAttribute('height', h);
+
+        // Update position, if it's static. If it's fixed, good luck?
+        if( /static/.test(pos) ){
+          $this.css('position', 'relative');
+        }
+
+        // Set some additional styling on canvas
+        $this.css({ 'overflow': 'hidden', 'cursor': settings.pointer });
+
+        // Cache the container's offset from the window
+        o = $this.offset();
+
+        // Expose a copy of the HTML5 context
+        c = $canvas.get()[0].getContext('2d');
+
         // Save a copy of the original image
         orig_image = $this.find('img').first();
 
@@ -233,40 +247,11 @@ $.fn.imagesLoaded = function(callback){
           source_height = target_image.height();
           source_width = target_image.width();
 
-          if( source_height <= orig_height ) {
-            return;
-          }
-
-          if( source_width <= orig_width ) {
-            return;
-          }
+          // Attach our DOM events after larger image is loaded
+          Events();
         });
 
-        // Attach canvas to our container
-        $canvas.appendTo($this);
-        $canvas.css({ 'width': settings.width, 'height': settings.height });
-        $canvas[0].setAttribute('width', w);
-        $canvas[0].setAttribute('height', h);
-
-
-        // Update position, if it's static. If it's fixed, good luck?
-        if( /static/.test(pos) ){
-          $this.css('position', 'relative');
-        }
-
-        // Set some additional styling on canvas
-        $this.css({ 'overflow': 'hidden', 'cursor': settings.pointer });
-
-        // Cache the container's offset from the window
-        o = $this.offset();
-
-        // Expose a copy of the raw element
-        c = $canvas.get()[0].getContext('2d');
-
-        Events();
-      })();
-
-
+      })(); // End init()
     });
   };
 
@@ -276,6 +261,6 @@ $.fn.imagesLoaded = function(callback){
     speed: '800',
     throttle: 50,
     pointer: 'crosshair',
-    canvas_style: 'display:none; position:absolute; border:1px solid #444;'
+    canvas_style: 'border:1px solid #444;'
   };
 })(jQuery);
