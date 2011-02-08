@@ -185,7 +185,7 @@ body.error {background: #FF3342; }
 #error button { margin-top:1em; }
 body.error #error {display:block; }
 
-
+#container section article.intro {float:right;}
 
 /*canvas {*/
      /*-moz-border-radius: 20px; */
@@ -197,7 +197,7 @@ body.error #error {display:block; }
 
 #container .image img, #container figure img {float:left;}
 #container .image, #container figure {float:left; position:relative;text-align:center; }
-#container section { float:left; clear:both; padding-bottom:2em;}
+#container section { float:left; clear:both; padding-bottom:2em; width:940px;}
 #container section article { float:left; width:450px; padding-right:20px;}
 
 

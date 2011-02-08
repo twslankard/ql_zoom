@@ -131,12 +131,12 @@
 
         // Prevent drawImage from chocking on values < 0
         if(sx < 0){
-          dx = Math.abs(sx) + sx / (source_width / orig_width );
+          //dx = Math.abs(sx) + sx / (source_width / orig_width );
           sx = 0;
         }
 
         if(sy < 0){
-          dy = Math.abs(sy) + sy/ ( source_height / orig_height );
+          //dy = Math.abs(sy) + sy/ ( source_height / orig_height );
           sy = 0;
         }
 
@@ -170,14 +170,19 @@
         }
       }
 
+      function tearDown(){
+        $canvas.remove();
+        target_image.remove();
+      }
+
       function Events() {
 
         if( source_height <= orig_height + ( orig_height / 10 ) ) {
-          return false;
+          return tearDown();
         }
 
         if( source_width <= orig_width + ( orig_width / 10 ) ) {
-          return false;
+          return tearDown();
         }
 
         // Bind show / hide canvas on hover
@@ -202,7 +207,7 @@
         // Create a container if the selector is the target image
         // TODO: fix this cause it doesn't work right =/
         if( /IMG/.test( $(this)[0].nodeName ) === true ) {
-          $this.wrapAll( $("<div>", { id: 'ql_zoom_'+_time, 'class': 'ql_zoom_container' }) );
+          $this.wrapAll( $("<div>", { 'id': 'ql_zoom_'+_time, 'class': 'ql_zoom_container' }) );
           $this = $('#ql_zoom_'+_time);
         }
 
@@ -220,7 +225,7 @@
         }
 
         // Set some additional styling on canvas
-        $this.css({ 'overflow': 'hidden', 'cursor': settings.pointer });
+        $this.css({ 'overflow': 'hidden'});
 
         // Cache the container's offset from the window
         o = $this.offset();
