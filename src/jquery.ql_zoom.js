@@ -141,6 +141,8 @@
         }
 
         // Math.floor all values on the way out to prevent subpixel rendering
+        //console.log('%s %s', orig_width, orig_height);
+        //console.log('%s %s %s %s %s %s %s %s | %s %s', ~~sx, ~~sy, ~~sW, ~~sH, ~~dx, ~~dy, ~~dW, ~~dH, ix, iy);
         return [~~sx, ~~sy, ~~sW, ~~sH, ~~dx, ~~dy, ~~dW, ~~dH];
       }
 
@@ -207,7 +209,7 @@
         // Create a container if the selector is the target image
         // TODO: fix this cause it doesn't work right =/
         if( /IMG/.test( $(this)[0].nodeName ) === true ) {
-          $this.wrapAll( $("<div>", { 'id': 'ql_zoom_'+_time, 'class': 'ql_zoom_container' }) );
+          $this.wrapAll( $("<div>", { id: 'ql_zoom_'+_time, 'class': 'ql_zoom_container' }) );
           $this = $('#ql_zoom_'+_time);
         }
 
@@ -236,18 +238,21 @@
         // Save a copy of the original image
         orig_image = $this.find('img').first();
 
-        // Cache original image dimensions
-        orig_height = orig_image.height();
-        orig_width = orig_image.width();
+        orig_image.imagesLoaded(function(){
+          // Cache original image dimensions
+          orig_height = orig_image.height();
+          orig_width = orig_image.width();
+        });
 
         // Attach the target image to the safe container
         target_image = $('<img>', { 'src': ( !! orig_image.data('url') ) ? orig_image.data('url') : orig_image.attr('src'), 'style': 'display:none;'}).appendTo($this);
 
         // Using the lovely & talented Paul Irish's imagesLoaded helper
         target_image.imagesLoaded(function(){
+
           // Cache source image dimensions
-          source_height = target_image.height();
-          source_width = target_image.width();
+          source_height = this.height();
+          source_width = this.width();
 
           // Attach our DOM events after larger image is loaded
           Events();
