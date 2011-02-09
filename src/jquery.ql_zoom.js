@@ -131,18 +131,16 @@
 
         // Prevent drawImage from chocking on values < 0
         if(sx < 0){
-          //dx = Math.abs(sx) + sx / (source_width / orig_width );
+          dx = (Math.abs(ix) + ix / (source_width / orig_width ));
           sx = 0;
         }
 
         if(sy < 0){
-          //dy = Math.abs(sy) + sy/ ( source_height / orig_height );
+          dy = Math.abs(iy) + iy/ ( source_height / orig_height );
           sy = 0;
         }
 
         // Math.floor all values on the way out to prevent subpixel rendering
-        //console.log('%s %s', orig_width, orig_height);
-        //console.log('%s %s %s %s %s %s %s %s | %s %s', ~~sx, ~~sy, ~~sW, ~~sH, ~~dx, ~~dy, ~~dW, ~~dH, ix, iy);
         return [~~sx, ~~sy, ~~sW, ~~sH, ~~dx, ~~dy, ~~dW, ~~dH];
       }
 
