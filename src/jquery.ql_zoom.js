@@ -101,8 +101,8 @@
         var sx, sy, sW, sH, dx, dy, dW, dH;
 
         // Mark the top left corner of target box, scaled from same point on original image
-        sx = ( (ix * source_width) / orig_width ) + (w / 2);
-        sy = ( (iy * source_height) / orig_height ) + (h /2);
+        sx = ( (ix * source_width) / orig_width ) + (( w / ( source_width / orig_width )) / 2 );
+        sy = ( (iy * source_height) / orig_height ) + (( w / ( source_height / orig_height)) / 2 );
 
         // Viewing box is set from user settings
         sW = w;
@@ -119,27 +119,24 @@
         // Handling for portion of viewer outside boundary of original image
         // by scaling down the draw area
         if(sx > source_width - w){
-          sW = source_width - sx;
-          dW = sW;
+          dW = ( source_width  - sx );
+          sW = dW;
+          //sx = orig_width;
         }
 
         if(sy > source_height - h){
-          sH = source_height - sy;
+          sH = ( source_height - sy );
           dH = sH;
         }
 
         // Prevent drawImage from chocking on values < 0
         if(sx < 0){
-          //dx = Math.abs(sx);
-          //sW = w + sx;
-          //dW = sW;
+          dx = (Math.abs(ix) + ix / (source_width / orig_width ));
           sx = 0;
         }
 
         if(sy < 0){
-          //dy = Math.abs(sy);
-          //sH = h + sy;
-          //dH = sH;
+          dy = Math.abs(iy) + iy/ ( source_height / orig_height );
           sy = 0;
         }
 
@@ -173,14 +170,19 @@
         }
       }
 
+      function tearDown(){
+        $canvas.remove();
+        target_image.remove();
+      }
+
       function Events() {
 
         if( source_height <= orig_height + ( orig_height / 10 ) ) {
-          return false;
+          return tearDown();
         }
 
         if( source_width <= orig_width + ( orig_width / 10 ) ) {
-          return false;
+          return tearDown();
         }
 
         // Bind show / hide canvas on hover
@@ -223,7 +225,7 @@
         }
 
         // Set some additional styling on canvas
-        $this.css({ 'overflow': 'hidden', 'cursor': settings.pointer });
+        $this.css({ 'overflow': 'hidden'});
 
         // Cache the container's offset from the window
         o = $this.offset();
@@ -234,18 +236,21 @@
         // Save a copy of the original image
         orig_image = $this.find('img').first();
 
-        // Cache original image dimensions
-        orig_height = orig_image.height();
-        orig_width = orig_image.width();
+        orig_image.imagesLoaded(function(){
+          // Cache original image dimensions
+          orig_height = orig_image.height();
+          orig_width = orig_image.width();
+        });
 
         // Attach the target image to the safe container
         target_image = $('<img>', { 'src': ( !! orig_image.data('url') ) ? orig_image.data('url') : orig_image.attr('src'), 'style': 'display:none;'}).appendTo($this);
 
         // Using the lovely & talented Paul Irish's imagesLoaded helper
         target_image.imagesLoaded(function(){
+
           // Cache source image dimensions
-          source_height = target_image.height();
-          source_width = target_image.width();
+          source_height = this.height();
+          source_width = this.width();
 
           // Attach our DOM events after larger image is loaded
           Events();
