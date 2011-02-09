@@ -11,7 +11,7 @@
     var elems = this.filter('img'),
         len   = elems.length;
 
-    elems.bind('load',function(){
+    elems.one('load',function(){
         if (--len <= 0){ callback.call(elems,this); }
     }).each(function(){
        // cached images don't fire load sometimes, so we reset src.
@@ -119,13 +119,13 @@
         // Handling for portion of viewer outside boundary of original image
         // by scaling down the draw area
         if(sx > source_width - w){
-          dW = ( source_width  - sx );
+          dW = ( orig_width - ix );
           sW = dW;
           //sx = orig_width;
         }
 
         if(sy > source_height - h){
-          sH = ( source_height - sy );
+          sH = ( orig_height - iy );
           dH = sH;
         }
 
