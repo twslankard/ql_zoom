@@ -13,7 +13,7 @@
         height: '200px',
         throttle: 10,
         pointer: 'crosshair',
-        canvas_style: '-webkit-border-radius:100px;-moz-border-radis:100px;border-radius:100px;' });
+        canvas_style: '-webkit-border-radius:100px;-moz-border-radius:100px;border-radius:100px;' });
     } else {
       alert('Your browser doens\'t support Canvas. \nThese aren\'t the droids you\'re looking for');
     }
