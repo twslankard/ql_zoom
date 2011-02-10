@@ -1,50 +1,9 @@
-// Dependencies:
-//  imagesLoaded
-//  throttle
-
-/*
-  $.fn.imagesLoaded mit license. paul irish. 2010.
-  webkit fix from Oren Solomianik. thx!
-*/
-(function($){
-  $.fn.imagesLoaded = function(callback){
-    var elems = this.filter('img'),
-        len   = elems.length;
-
-    elems.bind('load',function(){
-        if (--len <= 0){ callback.call(elems,this); }
-    }).each(function(){
-       // cached images don't fire load sometimes, so we reset src.
-       if (this.complete || this.complete === undefined){
-          var src = this.src;
-          // webkit hack from http://groups.google.com/group/jquery-dev/browse_thread/thread/eee6ab7b2da50e1f
-          // data uri bypasses webkit log warning (thx doug jones)
-          this.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
-          this.src = src;
-       }  
-    }); 
-
-    return this;
-  };
-})(jQuery);
-
-/*
-  jQuery throttle / debounce - v1.1 - 3/7/2010
-  http://benalman.com/projects/jquery-throttle-debounce-plugin/
-
-  Copyright (c) 2010 "Cowboy" Ben Alman
-  Dual licensed under the MIT and GPL licenses.
-  http://benalman.com/about/license/
-*/
-
-(function(b,c){var $=b.jQuery||b.Cowboy||(b.Cowboy={}),a;$.throttle=a=function(e,f,j,i){var h,d=0;if(typeof f!=="boolean"){i=j;j=f;f=c}function g(){var o=this,m=+new Date()-d,n=arguments;function l(){d=+new Date();j.apply(o,n)}function k(){h=c}if(i&&!h){l()}h&&clearTimeout(h);if(i===c&&m>e){l()}else{if(f!==true){h=setTimeout(i?k:l,i===c?e-m:e)}}}if($.guid){g.guid=j.guid=j.guid||$.guid++}return g};$.debounce=function(d,e,f){return f===c?a(d,e,false):a(d,f,e!==false)}})(this);
-
 /*
   QL Zoom
 
   Copyright (c) 2011 Samuel Breed, http://quickleft.com
 
-  v0.0.2
+  v0.0.3
 
   Permission is hereby granted, free of charge, to any person obtaining
   a copy of this software and associated documentation files (the
@@ -64,8 +23,45 @@
   LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
   OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
   WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+  with a little help from:
+
+  jQuery throttle / debounce - v1.1 - 3/7/2010
+  http://benalman.com/projects/jquery-throttle-debounce-plugin/
+
+  Copyright (c) 2010 "Cowboy" Ben Alman
+  Dual licensed under the MIT and GPL licenses.
+  http://benalman.com/about/license/
+
+
+  $.fn.imagesLoaded mit license. paul irish. 2010.
+  webkit fix from Oren Solomianik. thx!
+  https://gist.github.com/268257
 */
+
+(function(b,c){var $=b.jQuery||b.Cowboy||(b.Cowboy={}),a;$.throttle=a=function(e,f,j,i){var h,d=0;if(typeof f!=="boolean"){i=j;j=f;f=c}function g(){var o=this,m=+new Date()-d,n=arguments;function l(){d=+new Date();j.apply(o,n)}function k(){h=c}if(i&&!h){l()}h&&clearTimeout(h);if(i===c&&m>e){l()}else{if(f!==true){h=setTimeout(i?k:l,i===c?e-m:e)}}}if($.guid){g.guid=j.guid=j.guid||$.guid++}return g};$.debounce=function(d,e,f){return f===c?a(d,e,false):a(d,f,e!==false)}})(this);
+
 (function($){
+  $.fn.imagesLoaded = function(callback){
+    var elems = this.filter('img'),
+        len   = elems.length;
+
+    elems.one('load',function(){
+        if (--len <= 0){ callback.call(elems,this); }
+    }).each(function(){
+       // cached images don't fire load sometimes, so we reset src.
+       if (this.complete || this.complete === undefined){
+          var src = this.src;
+          // webkit hack from http://groups.google.com/group/jquery-dev/browse_thread/thread/eee6ab7b2da50e1f
+          // data uri bypasses webkit log warning (thx doug jones)
+          this.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
+          this.src = src;
+       }  
+    }); 
+
+    return this;
+  };
+
   $.fn.ql_zoom = function(options) {
     var settings = $.extend({}, $.fn.ql_zoom.defaultOptions, options);
 
@@ -119,13 +115,13 @@
         // Handling for portion of viewer outside boundary of original image
         // by scaling down the draw area
         if(sx > source_width - w){
-          dW = ( source_width  - sx );
+          dW = ( orig_width - ix );
           sW = dW;
           //sx = orig_width;
         }
 
         if(sy > source_height - h){
-          sH = ( source_height - sy );
+          sH = ( orig_height - iy );
           dH = sH;
         }
 
@@ -165,8 +161,7 @@
           c.clearRect(0,0,400,400);
           c.drawImage( target_image[0], rect[0], rect[1], rect[2], rect[3], rect[4], rect[5], rect[6], rect[7] );
         } catch(error){
-          // Debug ONLY
-          console.dir(error);
+          if( window.console ) { console.dir(error); }
         }
       }
 
@@ -177,11 +172,8 @@
 
       function Events() {
 
-        if( source_height <= orig_height + ( orig_height / 10 ) ) {
-          return tearDown();
-        }
-
-        if( source_width <= orig_width + ( orig_width / 10 ) ) {
+        // Don't load if target image is less than 10% larger than original
+        if( source_height <= orig_height + ( orig_height / 10 ) || source_width <= orig_width + ( orig_width / 10 ) ) {
           return tearDown();
         }
 
@@ -205,9 +197,8 @@
       // Set everything up
       (function init(){
         // Create a container if the selector is the target image
-        // TODO: fix this cause it doesn't work right =/
-        if( /IMG/.test( $(this)[0].nodeName ) === true ) {
-          $this.wrapAll( $("<div>", { id: 'ql_zoom_'+_time, 'class': 'ql_zoom_container' }) );
+        if( $(this)[0].nodeName == "IMG" ) {
+          $this.wrapAll( $("<div>", { 'id': 'ql_zoom_'+_time, 'class': 'ql_zoom_container' }) );
           $this = $('#ql_zoom_'+_time);
         }
 
